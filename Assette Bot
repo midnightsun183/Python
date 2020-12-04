@@ -1,0 +1,254 @@
+import os
+import tkinter
+from tkinter import *
+from tkinter import messagebox
+from tkinter import filedialog
+import tkinter as tk
+from tkinter import *
+import fnmatch,os
+
+from tkinter import filedialog
+LARGE_FONT = ('arial', 32, 'normal')
+import re
+from tkinter import filedialog
+
+#Global
+def countFiles():
+    folder_selected = filedialog.askdirectory()
+    file_count = sum(len(files) for _, _, files in os.walk(folder_selected))
+    print('Found',int(file_count), 'Files in', folder_selected)
+
+    num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.*'))
+    print('There were',num_files, 'files types in the main directory.')
+
+    num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.pdf'))
+    print('There were',num_files, 'PDFs in the main directory.')
+
+    num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.jpg'))
+    print('There were',num_files, ' JPGs in the main directory.')
+
+    num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.png'))
+    print('There were',num_files, 'PNGs in the main directory.')
+
+class Bot(tk.Tk):
+
+    def __init__(self, *args, **kwargs):
+        tk.Tk.__init__(self, *args, **kwargs)
+        container = tk.Frame(self)
+        self.geometry('800x500')
+
+        # Gets the requested values of the height and widht.
+        windowWidth = self.winfo_reqwidth()
+        windowHeight = self.winfo_reqheight()
+        print("Width", windowWidth, "Height", windowHeight)
+
+
+        # Gets both half the screen width/height and window width/height-- the higher the divisor the more center(ish)
+        positionRight = int(self.winfo_screenwidth() / 4 - windowWidth / 4)
+        positionDown = int(self.winfo_screenheight() / 4 - windowHeight / 4)
+
+        # Positions the window in the center of the page.
+        self.geometry("+{}+{}".format(positionRight, positionDown))
+        # This is the section of code which creates the main window
+
+
+        container.pack(side="top", fill="both", expand=True)
+
+        container.grid_rowconfigure(0, weight=1)
+        container.grid_columnconfigure(0, weight=1)
+
+
+        self.frames = {}
+
+        for F in (StartPage, PageOne, PageTwo,Configurations):
+            frame = F(container, self)
+
+            self.frames[F] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+
+        self.show_frame(StartPage)
+
+    def show_frame(self, cont):
+        frame = self.frames[cont]
+        frame.tkraise()
+
+
+class StartPage(tk.Frame):
+
+    def __init__(self, parent, controller):
+
+        tk.Frame.__init__(self, parent)
+        #self.geometry('600x400')
+        label = tk.Label(self, text='The Asset Bot', font= LARGE_FONT)
+        label.pack(padx=10, pady= 50)
+
+        ApplyButton = tk.Button(self,
+                                text="Count Files",
+
+                                command=countFiles)
+        ApplyButton.configure(width=10,
+                              fg="white",
+                              bg = "royalblue3",
+                              activebackground="royalblue2",
+                              relief=FLAT)
+        ApplyButton.pack()
+        ApplyButton.pack(padx = 10, pady = 10, side=BOTTOM)
+
+
+
+
+
+
+class PageOne(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text='The Easy Apply Bot', font = LARGE_FONT)
+        label.pack(pady=10, padx=10, side=TOP)
+
+        job_entry = tk.Entry(self,
+                      text='job_entry',
+                      font=('arial', 16, 'normal'))
+        job_entry.insert(0, "job_entry")
+        job_entry.pack(pady=10, padx=10, side=TOP)
+
+        job_location = Entry(self,
+                      text='job_location',
+                      font=('arial', 16, 'normal'))
+        job_location.insert(0, "job_location")
+        job_location.pack(pady=10, padx=10, side=TOP)
+
+        salary_entry = Entry(self,
+                      text='salary_entry',
+                      font=('arial', 16, 'normal'))
+        salary_entry.insert(0, "salary_entry")
+        salary_entry.pack(pady=10, padx=10, side=TOP)
+
+        ApplyButton = tk.Button(self,
+                                text="Easy Apply",
+
+                                command=lambda: controller.show_frame(PageTwo))
+        ApplyButton.configure(width=10,
+                              fg="white",
+                              bg = "royalblue3",
+                              activebackground="royalblue2",
+                              relief=FLAT)
+        ApplyButton.pack()
+        ApplyButton.pack(padx = 10, pady = 10, side=BOTTOM)
+
+        button1 = tk.Button(self, text="Statistics",
+                            command=lambda: controller.show_frame(PageTwo))
+        button1.pack()
+        button1.pack(padx = 10, pady = 10, side=BOTTOM)
+
+        button2 = tk.Button(self, text="Quit",
+                            command=lambda: controller.destroy())
+        button2.pack(padx = 10, pady = 10, side=BOTTOM)
+
+        button3 = tk.Button(self, text="Configurations",
+                            command=lambda: controller.show_frame(Configurations))
+        button3.pack()
+        button3.pack(padx = 10, pady = 10, side=BOTTOM)
+
+class PageTwo(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent, relief=RAISED, borderwidth=1)
+        label = tk.Label(self, text="'Statistics'", font=LARGE_FONT)
+        label.pack(pady=10, padx=10, side=TOP)
+
+        button2 = tk.Button(self, text="Main Page",
+                            command=lambda: controller.show_frame(PageOne))
+        button2.pack(padx = 10, pady = 10, side=BOTTOM)
+
+        quitButton = tk.Button(self, text="Quit",
+                            command=lambda: controller.destroy())
+        quitButton.pack(padx = 10, pady = 10, side=BOTTOM)
+
+class Configurations(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent, relief=RAISED, borderwidth=1)
+        #self.geometry('600x400')
+        label = tk.Label(self, text="Configurations", font=LARGE_FONT)
+        label.pack(pady=10, padx=10, side=TOP)
+
+        first_name_entry = Entry(self,
+                      text='first_name_entry',
+                      font=('arial', 16, 'normal'))
+        first_name_entry.insert(0, "first_name_entry")
+        first_name_entry.pack(pady=10, padx=10, side=TOP)
+
+        last_name_entry = Entry(self,
+                      text='last_name_entry',
+                      font=('arial', 16, 'normal'))
+        last_name_entry.insert(0, "last_name_entry")
+        last_name_entry.pack(pady=10, padx=10, side=TOP)
+
+        job_title_entry1 = Entry(self,
+                      text='job_title_entry1',
+                      font=('arial', 16, 'normal'))
+        job_title_entry1.insert(0, "job_title_entry1")
+        job_title_entry1.pack(pady=10, padx=10, side=TOP)
+
+        job_description_entry1 = Entry(self,
+                      text='job_description_entry1',
+                      font=('arial', 16, 'normal'))
+        job_description_entry1.insert(0, "job_description_entry1")
+        job_description_entry1.pack(pady=10, padx=10, side=TOP)
+
+        job_title_entry2 = Entry(self,
+                      text='job_title_entry2',
+                      font=('arial', 16, 'normal'))
+        job_title_entry2.insert(0, "job_title_entry2")
+        job_title_entry2.pack(pady=10, padx=10, side=TOP)
+
+        job_description_entry2 = Entry(self,
+                      text='job_description_entry2',
+                      font=('arial', 16, 'normal'))
+        job_description_entry2.insert(0, "job_description_entry2")
+        job_description_entry2.pack(pady=10, padx=10, side=TOP)
+
+        school_entry1 = Entry(self,
+                      text='school_entry1',
+                      font=('arial', 16, 'normal'))
+        school_entry1.insert(0, "school_entry1")
+        school_entry1.pack(pady=10, padx=10, side=TOP)
+
+        school_entry2 = Entry(self,
+                      text='school_entry2',
+                      font=('arial', 16, 'normal'))
+        school_entry2.insert(0, "school_entry2")
+        school_entry2.pack(pady=10, padx=10, side=TOP)
+
+
+        button2 = tk.Button(self, text="Main Page",
+                            command=lambda: controller.show_frame(PageOne))
+        button2.pack(padx = 10, pady = 10, side=BOTTOM)
+
+        quitButton = tk.Button(self, text="Quit",
+                            command=lambda: controller.destroy())
+        quitButton.pack(padx = 10, pady = 10, side=BOTTOM)
+
+        SaveButton = tk.Button(self, text="Save",
+                            command=lambda: controller.show_frame(Save))  #this should call the function to update config file
+        SaveButton.configure(width=10,
+                              fg="white",
+                              bg = "royalblue3",
+                              activebackground="royalblue2",
+                              relief=FLAT)
+        SaveButton.pack()
+        SaveButton.pack(padx = 10, pady = 10, side=BOTTOM)
+
+
+app = Bot()
+app.mainloop()
+
+
+
+
+
+
+
+
