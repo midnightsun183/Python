@@ -20,6 +20,7 @@ from tkinter import filedialog
 
 #Global
 def countFiles():
+    print("this work!!")
     folder_selected = filedialog.askdirectory()
     file_count = sum(len(files) for _, _, files in os.walk(folder_selected))
     print('Found',int(file_count), 'Files in', folder_selected)
@@ -134,7 +135,8 @@ def countFiles():
         print('There were', XMLcounter, 'XMLs')
 
 def countSlides():
-
+    print("this doesnt work quite yet")
+    #https://www.programmersought.com/article/20215432082/
     slides = folder_selected = filedialog.askdirectory()
     for slide in slides:
         print('slide number %d' % slides.index(slide) + 1)
@@ -145,6 +147,7 @@ def getFileName():
     print('The selected file:',path.name)
 
 def getPPTheadings():
+    print("this doesnt work quite yet")
     filepath = filedialog.askopenfilename()
     path = Path(filepath)
     print('The selected file:', path.name)
@@ -179,8 +182,14 @@ def CountPagesPDF():
     file = filedialog.askopenfilename()
     with open(file, 'rb') as pdf_file:
         pdf_reader = PdfFileReader(pdf_file)
-        print(f"The total number of pages in the pdf document is {pdf_reader.numPages}")
+        print(f"There are {pdf_reader.numPages} pages  in the selected PDF(s) ")
 
+
+    #Using a list, (which requires a work around: https://stackoverflow.com/questions/4116249/parsing-the-results-of-askopenfilenames
+#    files = askopenfilenames(initialdir="C:\\Users\\BVCAP\\Videos", title="Select files")
+#    files = master.tk.splitlist(files)  # Possible workaround
+#   self.num_files.set(len(files))
+#
 
 
 
