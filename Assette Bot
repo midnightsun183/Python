@@ -6,6 +6,7 @@ from tkinter import filedialog
 import tkinter as tk
 from tkinter import *
 import fnmatch,os
+import glob
 
 from tkinter import filedialog
 LARGE_FONT = ('arial', 32, 'normal')
@@ -21,14 +22,105 @@ def countFiles():
     num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.*'))
     print('There were',num_files, 'files types in the main directory.')
 
-    num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.pdf'))
-    print('There were',num_files, 'PDFs in the main directory.')
 
-    num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.jpg'))
-    print('There were',num_files, ' JPGs in the main directory.')
 
-    num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.png'))
-    print('There were',num_files, 'PNGs in the main directory.')
+
+    #num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.pdf'))
+    #print('There were',num_files, 'PDFs in the main directory.')
+
+    #num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.jpg'))
+    #print('There were',num_files, ' JPGs in the main directory.')
+
+    #num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.png'))
+    #print('There were',num_files, 'PNGs in the main directory.')
+
+    #Count Files in all sub-directors based on file type:
+
+# For some reason this is only counting the number of JPGs in the directoy
+#    list = ["PDF", "PPT", "PPTX", "JPG", "JPEG", "PNG", "SVG", 'TIF']
+#
+#    for l in list:
+#        Counter = 0
+#        for root, dirs, files in os.walk(folder_selected):
+#            for file in files:
+#                if file.endswith(l):
+#                    Counter += 1
+#        if Counter >= 0:
+#            print('There were', Counter)
+#
+#    print("----- Break-----")
+
+    PDFcounter = 0
+    for root, dirs, files in os.walk(folder_selected):
+        for file in files:
+            if file.endswith('.pdf'):
+                PDFcounter += 1
+    if PDFcounter > 0:
+        print('There were', PDFcounter, 'PDFs')
+
+    PPTcounter = 0
+    for root, dirs, files in os.walk(folder_selected):
+        for file in files:
+            if file.endswith('.ppt'):
+                PPTcounter += 1
+    if PPTcounter > 0:
+        print('There were', PPTcounter, 'PPTs')
+
+    PPTXcounter = 0
+    for root, dirs, files in os.walk(folder_selected):
+        for file in files:
+            if file.endswith('.pptx'):
+                PPTXcounter += 1
+    if PPTXcounter > 0:
+        print('There were', PPTXcounter, 'PPTXs')
+
+
+    JPGcounter = 0
+    for root, dirs, files in os.walk(folder_selected):
+        for file in files:
+            if file.endswith('.jpg'):
+                JPGcounter += 1
+    if JPGcounter > 0:
+        print('There were', JPGcounter, 'JPGs')
+
+
+    JPEGcounter = 0
+    for root, dirs, files in os.walk(folder_selected):
+        for file in files:
+            if file.endswith('.jpeg'):
+                JPEGcounter += 1
+    if JPEGcounter > 0:
+        print('There were', JPEGcounter, 'JPEGs')
+
+
+    PNGcounter = 0
+    for root, dirs, files in os.walk(folder_selected):
+        for file in files:
+            if file.endswith('.png'):
+                PNGcounter += 1
+    if PNGcounter > 0:
+        print('There were', PNGcounter, 'PNGs')
+
+    SVGcounter = 0
+    for root, dirs, files in os.walk(folder_selected):
+        for file in files:
+            if file.endswith('.svg'):
+                SVGcounter += 1
+    if SVGcounter > 0:
+        print('There were', SVGcounter, 'SVGs')
+
+
+    TIFcounter = 0
+    for root, dirs, files in os.walk(folder_selected):
+        for file in files:
+            if file.endswith('.pdf'):
+                TIFcounter += 1
+    if PDFcounter > 0:
+        print('There were', TIFcounter, 'TIFs')
+
+def CompareImages():
+    folder_selected = filedialog.askdirectory()
+
 
 class Bot(tk.Tk):
 
@@ -83,17 +175,29 @@ class StartPage(tk.Frame):
         label = tk.Label(self, text='The Asset Bot', font= LARGE_FONT)
         label.pack(padx=10, pady= 50)
 
-        ApplyButton = tk.Button(self,
+        CountFilesButton = tk.Button(self,
                                 text="Count Files",
 
                                 command=countFiles)
-        ApplyButton.configure(width=10,
+        CountFilesButton.configure(width=10,
                               fg="white",
                               bg = "royalblue3",
                               activebackground="royalblue2",
                               relief=FLAT)
-        ApplyButton.pack()
-        ApplyButton.pack(padx = 10, pady = 10, side=BOTTOM)
+        CountFilesButton.pack()
+        CountFilesButton.pack(padx = 10, pady = 10, side=BOTTOM)
+
+        CompareImagesButton = tk.Button(self,
+                                text="Compare Images",
+
+                                command=CompareImages)
+        CompareImagesButton.configure(width=10,
+                              fg="white",
+                              bg = "royalblue3",
+                              activebackground="royalblue2",
+                              relief=FLAT)
+        CompareImagesButton.pack()
+        CompareImagesButton.pack(padx = 10, pady = 10, side=BOTTOM)
 
 
 
