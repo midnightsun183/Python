@@ -7,6 +7,11 @@ import tkinter as tk
 from tkinter import *
 import fnmatch,os
 import glob
+from pptx import Presentation
+from pathlib import Path
+from pptx import *
+from pptx import slide
+from PyPDF2 import PdfFileReader
 
 from tkinter import filedialog
 LARGE_FONT = ('arial', 32, 'normal')
@@ -19,8 +24,10 @@ def countFiles():
     file_count = sum(len(files) for _, _, files in os.walk(folder_selected))
     print('Found',int(file_count), 'Files in', folder_selected)
 
-    num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.*'))
-    print('There were',num_files, 'files types in the main directory.')
+
+# This may not produce the correct output
+  #  num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.*'))
+  #  print('There were',num_files, 'files types in the main directory.')
 
 
 
@@ -36,7 +43,7 @@ def countFiles():
 
     #Count Files in all sub-directors based on file type:
 
-# For some reason this is only counting the number of JPGs in the directoy
+# For some reason this is only counting the number of JPGs in the directory
 #    list = ["PDF", "PPT", "PPTX", "JPG", "JPEG", "PNG", "SVG", 'TIF']
 #
 #    for l in list:
@@ -118,7 +125,68 @@ def countFiles():
     if PDFcounter > 0:
         print('There were', TIFcounter, 'TIFs')
 
+    XMLcounter = 0
+    for root, dirs, files in os.walk(folder_selected):
+        for file in files:
+            if file.endswith('.xml'):
+                XMLcounter += 1
+    if XMLcounter > 0:
+        print('There were', XMLcounter, 'XMLs')
+
+def countSlides():
+
+    slides = folder_selected = filedialog.askdirectory()
+    for slide in slides:
+        print('slide number %d' % slides.index(slide) + 1)
+
+def getFileName():
+    filepath = filedialog.askopenfilename()
+    path = Path(filepath)
+    print('The selected file:',path.name)
+
+def getPPTheadings():
+    filepath = filedialog.askopenfilename()
+    path = Path(filepath)
+    print('The selected file:', path.name)
+
+    filename = path.name  # your ppt filename
+
+    prs = Presentation(filename)
+    for slide in prs.slides:
+        title = slide.shapes.title.text
+        print(title)
+        if slide.shapes.title is None: continue
+
+
+def CountPagesPDF():
+    print("this works")
+    """
+    Extracting number of pages in the document
+
+    getNumPages()
+    Calculates the number of pages in this PDF file.
+
+    Returns:    number of pages
+    Return type:    int
+    Raises PdfReadError:
+        if file is encrypted and restrictions prevent this action.
+
+    numPages
+    Read-only property that accesses the getNumPages() function.
+    """
+
+    # Load the pdf to the PdfFileReader object with default settings
+    file = filedialog.askopenfilename()
+    with open(file, 'rb') as pdf_file:
+        pdf_reader = PdfFileReader(pdf_file)
+        print(f"The total number of pages in the pdf document is {pdf_reader.numPages}")
+
+
+
+
+
 def CompareImages():
+    print("this doesn't work yet")
     folder_selected = filedialog.askdirectory()
 
 
@@ -186,6 +254,37 @@ class StartPage(tk.Frame):
                               relief=FLAT)
         CountFilesButton.pack()
         CountFilesButton.pack(padx = 10, pady = 10, side=BOTTOM)
+
+
+
+#Extract all the headings(titles) from a ppt slides
+        getPPTheadingsButton = tk.Button(self,
+                                     text="Get PPT Headings",
+
+                                     command=getPPTheadings)
+        getPPTheadingsButton.configure(width=10,
+                                   fg="white",
+                                   bg="royalblue3",
+                                   activebackground="royalblue2",
+                                   relief=FLAT)
+        getPPTheadingsButton.pack()
+        getPPTheadingsButton.pack(padx=10, pady=10, side=BOTTOM)
+
+
+
+#Count PDF Pages
+        PDFCount = tk.Button(self,
+                                     text="Count PDF Pages",
+
+                                     command=CountPagesPDF)
+        PDFCount.configure(width=10,
+                                   fg="white",
+                                   bg="royalblue3",
+                                   activebackground="royalblue2",
+                                   relief=FLAT)
+        PDFCount.pack()
+        PDFCount.pack(padx=10, pady=10, side=BOTTOM)
+
 
         CompareImagesButton = tk.Button(self,
                                 text="Compare Images",
