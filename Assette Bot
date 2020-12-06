@@ -13,6 +13,11 @@ from pptx import *
 from pptx import slide
 from PyPDF2 import PdfFileReader
 
+import pandas as pd
+import os
+import glob
+from PyPDF2 import PdfFileReader
+
 from tkinter import filedialog
 LARGE_FONT = ('arial', 32, 'normal')
 import re
@@ -134,12 +139,24 @@ def countFiles():
     if XMLcounter > 0:
         print('There were', XMLcounter, 'XMLs')
 
+
+
+
+
 def countSlides():
     print("this doesnt work quite yet")
     #https://www.programmersought.com/article/20215432082/
-    slides = folder_selected = filedialog.askdirectory()
-    for slide in slides:
-        print('slide number %d' % slides.index(slide) + 1)
+    p = pptx.Presentation('f:\\1.pptx')
+    len(p.slides)
+
+
+
+
+
+
+#    slides = folder_selected = filedialog.askdirectory()
+#    for slide in slides:
+#        print('slide number %d' % slides.index(slide) + 1)
 
 def getFileName():
     filepath = filedialog.askopenfilename()
@@ -163,35 +180,38 @@ def getPPTheadings():
 
 def CountPagesPDF():
     print("this works")
-    """
-    Extracting number of pages in the document
-
-    getNumPages()
-    Calculates the number of pages in this PDF file.
-
-    Returns:    number of pages
-    Return type:    int
-    Raises PdfReadError:
-        if file is encrypted and restrictions prevent this action.
-
-    numPages
-    Read-only property that accesses the getNumPages() function.
-    """
-
-    # Load the pdf to the PdfFileReader object with default settings
-    file = filedialog.askopenfilename()
-    with open(file, 'rb') as pdf_file:
-        pdf_reader = PdfFileReader(pdf_file)
-        print(f"There are {pdf_reader.numPages} pages  in the selected PDF(s) ")
 
 
-    #Using a list, (which requires a work around: https://stackoverflow.com/questions/4116249/parsing-the-results-of-askopenfilenames
-#    files = askopenfilenames(initialdir="C:\\Users\\BVCAP\\Videos", title="Select files")
-#    files = master.tk.splitlist(files)  # Possible workaround
-#   self.num_files.set(len(files))
-#
+#Returns table of all PDFs with page number of each
+
+    list_of_pdf_filenames = glob.glob('*pdf')
+    df = pd.DataFrame(columns=['fileName', 'fileLocation', 'pageNumber'])
+
+    for root, dirs, files in os.walk(filedialog.askdirectory()):
+
+        for f in files:
+            if f.endswith(".pdf"):
+
+                pdf=PdfFileReader(open(os.path.join(root, f),'rb'))
+                df2 = pd.DataFrame([[f, os.path.join(root,f), pdf.getNumPages()]], columns=['fileName', 'fileLocation', 'pageNumber'])
+                df = df.append(df2, ignore_index=True)
+    print(df.head)
 
 
+def appendFileName():
+    for root, dirs, files in os.walk(filedialog.askdirectory()):
+        for f in files:
+            #replaces '-' with a space, and appends the file with user input
+            new_filename = f.replace("-", "")
+            new_filename = input() + new_filename
+            os.rename(f, new_filename)
+
+
+def PPTtoPDFconvert():
+    from pdf2image import convert_from_path
+    pages = convert_from_path('pdf_file', 500)
+    for page in pages:
+        page.save('out.jpg', 'JPEG')
 
 
 def CompareImages():
