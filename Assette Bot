@@ -1,177 +1,73 @@
-import os
-import tkinter
 from tkinter import *
 from tkinter import messagebox
 from tkinter import filedialog
 import tkinter as tk
-from tkinter import *
-import fnmatch,os
-import glob
+
+
 from pptx import Presentation
 from pathlib import Path
 from pptx import *
 from pptx import slide
 from PyPDF2 import PdfFileReader
-
 import pandas as pd
-import os
-import glob
+
 from PyPDF2 import PdfFileReader
 
-from tkinter import filedialog
-LARGE_FONT = ('arial', 32, 'normal')
-import re
-from tkinter import filedialog
+import os, fnmatch, pptx, glob, os, tkinter
 
-#Global
+
+import xml.etree.ElementTree as ET
+
+# import win32compat as win32com # might be >> import win32core as win32com
+from pdf2image import convert_from_path
+
+
+
+from pdf2jpg import pdf2jpg
+
+from pdf2image import convert_from_path
+
+
+
+LARGE_FONT = ('arial', 32, 'normal')
+
+
+#Global Functions
 def countFiles():
-    print("this work!!")
     folder_selected = filedialog.askdirectory()
     file_count = sum(len(files) for _, _, files in os.walk(folder_selected))
-    print('Found',int(file_count), 'Files in', folder_selected)
+    print("Total Files:", file_count, "in", folder_selected)
+#Lists files by count in root and all sub-directories
+    # File format is case sensitive
+    list = ["pdf", "ppt", "pptx", "jpg", "jpeg", "png", "svg", 'tif', "xml",
+            "xlsm", "zip", "7z", "arj", "deb", "pkg", "rar", "csv", "dat",
+            "log", "mdb", "sav", "sql", "tar", "apk", "bat", "bin", "cgi",
+            "com", "exe", "jar", "msi", "py"]
+    for l in list:
+
+        i = 0
+        for root, dirs, files in os.walk(folder_selected):
+            for file in files:
+                if file.endswith(l):
+                    i += 1
+        if i > 0:
+            print('There were', i, l)
+
+    print("----- Break-----")
 
 
-# This may not produce the correct output
-  #  num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.*'))
-  #  print('There were',num_files, 'files types in the main directory.')
-
-
-
-
-    #num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.pdf'))
-    #print('There were',num_files, 'PDFs in the main directory.')
-
-    #num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.jpg'))
-    #print('There were',num_files, ' JPGs in the main directory.')
-
-    #num_files = len(fnmatch.filter(os.listdir(folder_selected), '*.png'))
-    #print('There were',num_files, 'PNGs in the main directory.')
-
-    #Count Files in all sub-directors based on file type:
-
-# For some reason this is only counting the number of JPGs in the directory
-#    list = ["PDF", "PPT", "PPTX", "JPG", "JPEG", "PNG", "SVG", 'TIF']
-#
-#    for l in list:
-#        Counter = 0
-#        for root, dirs, files in os.walk(folder_selected):
-#            for file in files:
-#                if file.endswith(l):
-#                    Counter += 1
-#        if Counter >= 0:
-#            print('There were', Counter)
-#
-#    print("----- Break-----")
-
-    PDFcounter = 0
-    for root, dirs, files in os.walk(folder_selected):
-        for file in files:
-            if file.endswith('.pdf'):
-                PDFcounter += 1
-    if PDFcounter > 0:
-        print('There were', PDFcounter, 'PDFs')
-
-    PPTcounter = 0
-    for root, dirs, files in os.walk(folder_selected):
-        for file in files:
-            if file.endswith('.ppt'):
-                PPTcounter += 1
-    if PPTcounter > 0:
-        print('There were', PPTcounter, 'PPTs')
-
-    PPTXcounter = 0
-    for root, dirs, files in os.walk(folder_selected):
-        for file in files:
-            if file.endswith('.pptx'):
-                PPTXcounter += 1
-    if PPTXcounter > 0:
-        print('There were', PPTXcounter, 'PPTXs')
-
-
-    JPGcounter = 0
-    for root, dirs, files in os.walk(folder_selected):
-        for file in files:
-            if file.endswith('.jpg'):
-                JPGcounter += 1
-    if JPGcounter > 0:
-        print('There were', JPGcounter, 'JPGs')
-
-
-    JPEGcounter = 0
-    for root, dirs, files in os.walk(folder_selected):
-        for file in files:
-            if file.endswith('.jpeg'):
-                JPEGcounter += 1
-    if JPEGcounter > 0:
-        print('There were', JPEGcounter, 'JPEGs')
-
-
-    PNGcounter = 0
-    for root, dirs, files in os.walk(folder_selected):
-        for file in files:
-            if file.endswith('.png'):
-                PNGcounter += 1
-    if PNGcounter > 0:
-        print('There were', PNGcounter, 'PNGs')
-
-    SVGcounter = 0
-    for root, dirs, files in os.walk(folder_selected):
-        for file in files:
-            if file.endswith('.svg'):
-                SVGcounter += 1
-    if SVGcounter > 0:
-        print('There were', SVGcounter, 'SVGs')
-
-
-    TIFcounter = 0
-    for root, dirs, files in os.walk(folder_selected):
-        for file in files:
-            if file.endswith('.pdf'):
-                TIFcounter += 1
-    if PDFcounter > 0:
-        print('There were', TIFcounter, 'TIFs')
-
-    XMLcounter = 0
-    for root, dirs, files in os.walk(folder_selected):
-        for file in files:
-            if file.endswith('.xml'):
-                XMLcounter += 1
-    if XMLcounter > 0:
-        print('There were', XMLcounter, 'XMLs')
-
-
-
-
-
-def countSlides():
-    print("this doesnt work quite yet")
-    #https://www.programmersought.com/article/20215432082/
-    p = pptx.Presentation('f:\\1.pptx')
-    len(p.slides)
-
-
-
-
-
-
-#    slides = folder_selected = filedialog.askdirectory()
-#    for slide in slides:
-#        print('slide number %d' % slides.index(slide) + 1)
-
-def getFileName():
-    filepath = filedialog.askopenfilename()
-    path = Path(filepath)
-    print('The selected file:',path.name)
+def PPTtoTextParser():
+    data = filedialog.askopenfilename()
+    doc = ET.fromstring(data)
+    for AAA in doc.findall('AAA'):
+        print
+        len(AAA.findall('CCC'))
 
 def getPPTheadings():
     print("this doesnt work quite yet")
-    filepath = filedialog.askopenfilename()
-    path = Path(filepath)
-    print('The selected file:', path.name)
-
-    filename = path.name  # your ppt filename
-
-    prs = Presentation(filename)
+    fileName = filedialog.askopenfilename()
+ 
+    prs = Presentation(fileName)
     for slide in prs.slides:
         title = slide.shapes.title.text
         print(title)
@@ -179,14 +75,13 @@ def getPPTheadings():
 
 
 def CountPagesPDF():
+# Returns table of all PDFs with page number of each
     print("this works")
-
-
-#Returns table of all PDFs with page number of each
 
     list_of_pdf_filenames = glob.glob('*pdf')
     df = pd.DataFrame(columns=['fileName', 'fileLocation', 'pageNumber'])
 
+#PDF Data Frame
     for root, dirs, files in os.walk(filedialog.askdirectory()):
 
         for f in files:
@@ -198,6 +93,29 @@ def CountPagesPDF():
     print(df.head)
 
 
+    for root, dirs, files in os.walk(filedialog.askdirectory()):
+
+        for f in files:
+#PowerPoint Data Frame
+# This works, but count the wrong number of pages...
+            if f.endswith(".pptx"):
+                p = pptx.Presentation()
+                df2 = pd.DataFrame([[f, os.path.join(root, f), len(p.slides)]],
+                                   columns=['fileName', 'fileLocation', 'pageNumber'])
+                df = df.append(df2, ignore_index=True)
+    print(df.head)
+
+
+def countSlides():
+    #https://www.programmersought.com/article/20215432082/
+    p = pptx.Presentation(filedialog.askopenfilename())
+
+    print(len(p.slides))
+
+
+
+
+
 def appendFileName():
     for root, dirs, files in os.walk(filedialog.askdirectory()):
         for f in files:
@@ -207,12 +125,39 @@ def appendFileName():
             os.rename(f, new_filename)
 
 
-def PPTtoPDFconvert():
-    from pdf2image import convert_from_path
-    pages = convert_from_path('pdf_file', 500)
-    for page in pages:
-        page.save('out.jpg', 'JPEG')
+def PDFpageExtraction():
 
+    # this needs work: https://stackoverflow.com/questions/46184239/extract-a-page-from-a-pdf-as-a-jpeg
+    # https://simply-python.com/2018/11/15/convert-pdf-pages-to-jpeg-with-python/
+    import os
+    import tempfile
+    from pdf2image import convert_from_path
+
+    filename = filedialog.askopenfilename()
+    with tempfile.TemporaryDirectory() as path:
+        images_from_path = convert_from_path(filename, output_folder=path, last_page=1, first_page=0)
+
+    base_filename = os.path.splitext(os.path.basename(filename))[0] + '.jpg'
+
+    save_dir = filedialog.askdirectory()
+
+    for page in images_from_path:
+        page.save(os.path.join(save_dir, base_filename), 'JPEG')
+
+
+    #try:
+    #    pdf_dir = filedialog.askdirectory()
+    #    os.chdir(pdf_dir)
+    #
+    #    for pdf_file in os.listdir(pdf_dir):
+    #
+    #        if pdf_file.endswith(".pdf"):
+    #
+    #            pages = convert_from_path(pdf_file, 300)
+    #            pdf_file = pdf_file[:-4]
+    #
+    #            for page in pages:
+    #                page.save("%s-page%d.jpg" % (pdf_file, pages.index(page)), "JPEG")
 
 def CompareImages():
     print("this doesn't work yet")
@@ -272,6 +217,40 @@ class StartPage(tk.Frame):
         label = tk.Label(self, text='The Asset Bot', font= LARGE_FONT)
         label.pack(padx=10, pady= 50)
 
+        #countSlides
+        countSlidesButton = tk.Button(self,
+                                     text="Count Slides",
+
+                                     command=countSlides)
+        countSlidesButton.configure(width=10,
+                                   fg="white",
+                                   bg="royalblue3",
+                                   activebackground="royalblue2",
+                                   relief=FLAT)
+        countSlidesButton.pack()
+        countSlidesButton.pack(padx=10, pady=10, side=BOTTOM)
+
+
+
+        #countSlides
+        PPTtoTextParserButton = tk.Button(self,
+                                     text="PPTtoTextParser",
+
+                                     command=PPTtoTextParser)
+        PPTtoTextParserButton.configure(width=10,
+                                   fg="white",
+                                   bg="royalblue3",
+                                   activebackground="royalblue2",
+                                   relief=FLAT)
+        PPTtoTextParserButton.pack()
+        PPTtoTextParserButton.pack(padx=10, pady=10, side=BOTTOM)
+
+
+
+
+
+
+
         CountFilesButton = tk.Button(self,
                                 text="Count Files",
 
@@ -298,6 +277,20 @@ class StartPage(tk.Frame):
                                    relief=FLAT)
         getPPTheadingsButton.pack()
         getPPTheadingsButton.pack(padx=10, pady=10, side=BOTTOM)
+
+#Extract PDF pages as PNG
+        PDFpagetoPNG = tk.Button(self,
+                                     text="PDF to PNG",
+
+                                     command=PDFpageExtraction)
+        PDFpagetoPNG.configure(width=10,
+                                   fg="white",
+                                   bg="royalblue3",
+                                   activebackground="royalblue2",
+                                   relief=FLAT)
+        PDFpagetoPNG.pack()
+        PDFpagetoPNG.pack(padx=10, pady=10, side=BOTTOM)
+
 
 
 
