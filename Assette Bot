@@ -1,33 +1,19 @@
-from tkinter import *
-from tkinter import messagebox
-from tkinter import filedialog
-import tkinter as tk
+import os, fnmatch, pptx, glob, tkinter, tempfile
 
+import xml.etree.ElementTree as ET, tkinter as tk, pandas as pd
 
+from PyPDF2 import PdfFileReader
 from pptx import Presentation
-from pathlib import Path
-from pptx import *
-from pptx import slide
-from PyPDF2 import PdfFileReader
-import pandas as pd
+from pdf2image import convert_from_path
+from tkinter import *
+from tkinter import filedialog
 
 from PyPDF2 import PdfFileReader
-
-import os, fnmatch, pptx, glob, os, tkinter
-
-
-import xml.etree.ElementTree as ET
 
 # import win32compat as win32com # might be >> import win32core as win32com
-from pdf2image import convert_from_path
-
-
-
+from pathlib import Path
+#from pptx import *
 from pdf2jpg import pdf2jpg
-
-from pdf2image import convert_from_path
-
-
 
 LARGE_FONT = ('arial', 32, 'normal')
 
@@ -42,7 +28,7 @@ def countFiles():
     list = ["pdf", "ppt", "pptx", "jpg", "jpeg", "png", "svg", 'tif', "xml",
             "xlsm", "zip", "7z", "arj", "deb", "pkg", "rar", "csv", "dat",
             "log", "mdb", "sav", "sql", "tar", "apk", "bat", "bin", "cgi",
-            "com", "exe", "jar", "msi", "py"]
+            "com", "exe", "jar", "msi", "py", "txt"]
     for l in list:
 
         i = 0
@@ -60,18 +46,37 @@ def PPTtoTextParser():
     data = filedialog.askopenfilename()
     doc = ET.fromstring(data)
     for AAA in doc.findall('AAA'):
-        print
-        len(AAA.findall('CCC'))
+        print(len(AAA.findall('CCC')))
 
-def getPPTheadings():
-    print("this doesnt work quite yet")
+
+def PPTbyElement():
+# Works just need to append the dataframe to add keyterms
     fileName = filedialog.askopenfilename()
- 
     prs = Presentation(fileName)
+
+    df = pd.DataFrame(columns=['KeyTerm','Count'])
+    keys = ["Risk"]
+    i = 0
     for slide in prs.slides:
-        title = slide.shapes.title.text
-        print(title)
-        if slide.shapes.title is None: continue
+
+        for k in keys:
+            #df.append(df, ignore_index=True)
+            title = slide.shapes.title.text
+            print(title)
+            if k in title:
+                i += 1
+
+             #   df.append(df, ignore_index=True)
+        if slide.shapes.title is None:
+            continue
+        df.append(df, ignore_index=True)
+        df = pd.DataFrame([[k, i]], columns=['KeyTerm', 'Count'])
+
+    print(df)
+
+
+
+    print("----Process Complete-----")
 
 
 def CountPagesPDF():
@@ -97,7 +102,7 @@ def CountPagesPDF():
 
         for f in files:
 #PowerPoint Data Frame
-# This works, but count the wrong number of pages...
+# This works...retrieves the correct file and courn, but outputs the wrong number of pages on PPT
             if f.endswith(".pptx"):
                 p = pptx.Presentation()
                 df2 = pd.DataFrame([[f, os.path.join(root, f), len(p.slides)]],
@@ -115,7 +120,6 @@ def countSlides():
 
 
 
-
 def appendFileName():
     for root, dirs, files in os.walk(filedialog.askdirectory()):
         for f in files:
@@ -129,9 +133,7 @@ def PDFpageExtraction():
 
     # this needs work: https://stackoverflow.com/questions/46184239/extract-a-page-from-a-pdf-as-a-jpeg
     # https://simply-python.com/2018/11/15/convert-pdf-pages-to-jpeg-with-python/
-    import os
-    import tempfile
-    from pdf2image import convert_from_path
+
 
     filename = filedialog.askopenfilename()
     with tempfile.TemporaryDirectory() as path:
@@ -174,8 +176,6 @@ class Bot(tk.Tk):
         # Gets the requested values of the height and widht.
         windowWidth = self.winfo_reqwidth()
         windowHeight = self.winfo_reqheight()
-        print("Width", windowWidth, "Height", windowHeight)
-
 
         # Gets both half the screen width/height and window width/height-- the higher the divisor the more center(ish)
         positionRight = int(self.winfo_screenwidth() / 4 - windowWidth / 4)
@@ -266,17 +266,18 @@ class StartPage(tk.Frame):
 
 
 #Extract all the headings(titles) from a ppt slides
-        getPPTheadingsButton = tk.Button(self,
-                                     text="Get PPT Headings",
+        PPTbyElementButton = tk.Button(self,
+                                     text="PPT by Element",
 
-                                     command=getPPTheadings)
-        getPPTheadingsButton.configure(width=10,
+                                     command=PPTbyElement)
+        PPTbyElementButton.configure(width=10,
                                    fg="white",
                                    bg="royalblue3",
                                    activebackground="royalblue2",
                                    relief=FLAT)
-        getPPTheadingsButton.pack()
-        getPPTheadingsButton.pack(padx=10, pady=10, side=BOTTOM)
+        PPTbyElementButton.pack()
+        PPTbyElementButton.pack(padx=10, pady=10, side=BOTTOM)
+
 
 #Extract PDF pages as PNG
         PDFpagetoPNG = tk.Button(self,
