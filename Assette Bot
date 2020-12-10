@@ -53,25 +53,26 @@ def PPTbyElement():
 # Works just need to append the dataframe to add keyterms
     fileName = filedialog.askopenfilename()
     prs = Presentation(fileName)
+    count = 0
+    df = pd.DataFrame(columns=['Key', 'Count'])
+    keys = ["Risk", "Performance", "Important", "Term 4"]
+    for k in keys:
+        count = 0
 
-    df = pd.DataFrame(columns=['KeyTerm','Count'])
-    keys = ["Risk"]
-    i = 0
-    for slide in prs.slides:
 
-        for k in keys:
-            #df.append(df, ignore_index=True)
+        for slide in prs.slides:
             title = slide.shapes.title.text
             print(title)
-            if k in title:
-                i += 1
 
-             #   df.append(df, ignore_index=True)
+
+            if k in title:
+                count += 1
+
+        df2 = pd.DataFrame([[k, count]], columns=['Key', 'Count'])
+        df = df.append(df2, ignore_index=False)
+
         if slide.shapes.title is None:
             continue
-        df.append(df, ignore_index=True)
-        df = pd.DataFrame([[k, i]], columns=['KeyTerm', 'Count'])
-
     print(df)
 
 
@@ -81,8 +82,6 @@ def PPTbyElement():
 
 def CountPagesPDF():
 # Returns table of all PDFs with page number of each
-    print("this works")
-
     list_of_pdf_filenames = glob.glob('*pdf')
     df = pd.DataFrame(columns=['fileName', 'fileLocation', 'pageNumber'])
 
