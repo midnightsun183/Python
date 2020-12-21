@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os, fnmatch, pptx, glob, tkinter, tempfile, shutil
 import tkinter as tk, pandas as pd
 import xml.etree.ElementTree as ET
@@ -12,6 +13,61 @@ from tkinter import filedialog
 from tkinter import ttk
 import glob
 import tqdm
+
+
+from pptx import Presentation
+import argparse
+from tkinter import filedialog
+import os
+
+
+
+
+
+
+
+
+def analyze_ppt(dir):
+
+    for root, dirs, files in os.walk(dir):
+        for f in files:
+            if f.endswith("pptx"):
+                """ Take the input file and analyze the structure."""
+                prs = Presentation()
+                print(prs)
+                # Each powerpoint file has multiple layouts
+                # Loop through them all and  see where the various elements are
+                for index, _ in enumerate(prs.slide_layouts):
+                    slide = prs.slides.add_slide(prs.slide_layouts[index])
+                    # Not every slide has to have a title
+                    try:
+                        title = slide.shapes.title
+                        title.text = 'Title for Layout {}'.format(index)
+                    except AttributeError:
+                        print("No Title for Layout {}".format(index))
+                    # Go through all the placeholders and identify them by index and type
+                    for shape in slide.placeholders:
+                        if shape.is_placeholder:
+                            phf = shape.placeholder_format
+                            # Do not overwrite the title which is just a special placeholder
+                            try:
+                                if 'Title' not in shape.text:
+                                    shape.text = 'Placeholder index:{} type:{}'.format(phf.idx, shape.name)
+                            except AttributeError:
+                                print("{} has no text attribute".format(phf.type))
+                            print('{} {}'.format(phf.idx, shape.name))
+               # prs.save(output)
+
+
+
+
+'''
+# for ImportZip
+import zipfile
+from StringIO import StringIO
+from PIL import Image
+import imghdr
+'''
 
 
 '''
@@ -40,40 +96,18 @@ import glob
 import tqdm
 import win32com.client
 import pywintypes
-
-#Global Functions
-
+from os import getcwd
 
 
 def main():
     dir = filedialog.askdirectory()
-    '''
-#Count files in Directory by type
-    file_count = sum(len(files) for _, _, files in os.walk(dir))
-    print("Total Files:", file_count, "in", dir)
-    # Lists files by count in root and all sub-directories
-    # File format is case sensitive
-    list = ["pdf", "ppt", "pptx", "jpg", "jpeg", "png", "svg", 'tif', "xml",
-            "xlsm", "zip", "7z", "arj", "deb", "pkg", "rar", "csv", "dat",
-            "log", "mdb", "sav", "sql", "tar", "apk", "bat", "bin", "cgi",
-            "com", "exe", "jar", "msi", "py", "txt"]
-    for l in list:
 
-        i = 0
-        for root, dirs, files in os.walk(dir):
-            for file in files:
-                if file.endswith(l):
-                    i += 1
-        if i > 0:
-            print('There were', i, l)
-
-    print("----- File Count Complete -----")
-
-'''
 # Count total files by type in root and all sub-directories
- #   file_count = sum(len(files) for _, _, files in os.walk(dir))
-
- #   list_of_pdf_filenames = glob.glob('*.*')
+    #Todo:
+        #Group by Sub-directories
+        #Speed up file counting
+            #list_of_pdf_filenames = glob.glob('*.*') ???
+        #Supress filetypes that were not found in Dataframe
     df = pd.DataFrame(columns=['FileType', 'Number'])
 
     # File format is case sensitive
@@ -94,19 +128,8 @@ def main():
         df = df.append(df2, ignore_index=True)
     print(f'{df} \n  ----File Count Complete-----')
 
-
-
-    print("----- File Count Complete -----")
-
-
-
-
-
-
-
-
-
 # Returns table of all PDFs with page number of each
+# Returns empty Dataframe if no PDFs found
     list_of_pdf_filenames = glob.glob('*pdf')
     df = pd.DataFrame(columns=['fileName', 'fileLocation', 'pageNumber'])
     # PDF Data Frame
@@ -119,23 +142,58 @@ def main():
                                    columns=['fileName', 'fileLocation', 'pageNumber'])
                 df = df.append(df2, ignore_index=True)
     print(f'{df} \n  ----PDF Page Count Complete-----')
+
+
+
+# Count PPT Elements by Keyword
+    for root, dirs, files in os.walk(dir):
+        for f in files:
+            if f.endswith("pptx"):
+
+                #prs = Presentation(f)
+                #count = 0
+                df = pd.DataFrame(columns=['File','Key', 'Count'])
+               # f = os.path.basename(f)
+                #keys are  case sensitive
+                keys = ["Risk", "Performance", "Important", "Disclosure", "Portfolio", "Term 4", "Term 5, 7,8,9"]
+                for k in keys:
+                    count = 0
+
+                    for slide in Presentation.slides:
+                        title = slide.shapes.title.text
+                        print(title)
+
+                        if k in title:
+                            count += 1
+
+                    df2 = pd.DataFrame([[f,k, count]], columns=['File','Key', 'Count'])
+                    df = df.append(df2, ignore_index=False)
+
+                    if slide.shapes.title is None:
+                        continue
+                print(f'{df} \n  ----Process Complete-----')
+
 '''
-#Counts the number of pages in PPT (not working)
-            if f.endswith(".ppt"):
-                p = pptx.Presentation(os.path.basename(f))
+#Counts the number of pages in PPT 
+# Not working correctly -- counts pages wrong
+    df = pd.DataFrame(columns=['fileName', 'pageNumber'])
+    ppt= 0
+    for root, dirs, files in os.walk(dir):
+        for f in files:
+            if f.endswith(".pptx"):
+                p = pptx.Presentation(os.path.abspath(f))
                 ppt = len(p.slides)
 
-                df2 = pd.DataFrame([[f, os.path.join(root, f), ppt]],
-                                   columns=['fileName', 'fileLocation', 'pageNumber'])
+                df2 = pd.DataFrame([[f, ppt]],
+                                   columns=['fileName', 'pageNumber'])
                 df = df.append(df2, ignore_index=True)
-    print(ppt)
+    print(f'{df} \n  ----PPT Page Count Complete-----')
 '''
-
-
 def PPTtoPDF():
 #Works on UBUNTU 20.04 -- LibreOffice Dependent
     path = filedialog.askdirectory()
     files = [f for f in glob.glob(path + "**/*.pptx", recursive=True)]
+
     for f in tqdm.tqdm(files):
         command = "unoconv -f pdf \"{}\"".format(f)
         os.system(command)
@@ -170,33 +228,6 @@ def PPTtoTextParser():
         print(len(AAA.findall('CCC')))
 
 
-def PPTbyElement():
-
-    fileName = filedialog.askopenfilename()
-    prs = Presentation(fileName)
-    #count = 0
-    df = pd.DataFrame(columns=['File','Key', 'Count'])
-    f = os.path.basename(fileName)
-#keys are  case sensitive
-    keys = ["Risk", "Performance", "Important", "Disclosure", "Portfolio", "Term 4", "Term 5, 7,8,9"]
-    for k in keys:
-        count = 0
-
-
-        for slide in prs.slides:
-            title = slide.shapes.title.text
-            print(title)
-
-
-            if k in title:
-                count += 1
-
-        df2 = pd.DataFrame([[f,k, count]], columns=['File','Key', 'Count'])
-        df = df.append(df2, ignore_index=False)
-
-        if slide.shapes.title is None:
-            continue
-    print(f'{df} \n  ----Process Complete-----')
 
 
 
@@ -265,6 +296,24 @@ def PDFpageExtraction():
 
     for page in images_from_path:
         page.save(os.path.join(save_dir, base_filename), 'JPEG')
+
+def extractZip():
+    imgzip = open('100-Test.zip')
+    zippedImgs = zipfile.ZipFile(imgzip)
+
+    for i in xrange(len(zippedImgs.namelist())):
+        print("iter", i, " ",)
+        file_in_zip = zippedImgs.namelist()[i]
+        if (".jpg" in file_in_zip or ".JPG" in file_in_zip):
+            print("Found image: ", file_in_zip, " -- ",)
+            data = zippedImgs.read(file_in_zip)
+            dataEnc = StringIO(data)
+            img = Image.open(dataEnc)
+            print
+            img
+        else:
+            print
+            ""
 
 
 def CompareImages():
@@ -448,12 +497,17 @@ class PageOne(tk.Frame):
                 if subtypeVariable.get() == "PPT Analysis (Not Working)":
                     print(subtypeVariable.get())
                     CountPagesPDFWorking()
-                if subtypeVariable.get() == "PDF Analysis":
-                    CountPagesPDF()
 
             if typeVariable.get() == "Inspect File":
 
-                if subtypeVariable.get() == "Append File Names":
+                if subtypeVariable.get() == "Analyze PPTX":
+                    print(subtypeVariable.get())
+                    dir = filedialog.askdirectory()
+                   #input = filedialog.askopenfilename()
+                    #output = os.path.basename(input[-4])
+                    analyze_ppt(dir)#input, output)
+
+                if subtypeVariable.get() == 'Append File Names':
                     print(subtypeVariable.get())
 
                 if subtypeVariable.get() == 'Count Slides in PowerPoint':
@@ -508,6 +562,7 @@ class PageOne(tk.Frame):
 
         so = ttk.Combobox(self, textvariable=subtypeVariable)
         so.config(values=('Count Files in Selected Directory',
+                          'Analyze PPTX',
                           'PPT Analysis (Not Working)',
                           'Count Slides in PowerPoint',
                           'PDF Analysis',
